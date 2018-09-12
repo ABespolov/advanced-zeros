@@ -1,29 +1,72 @@
 module.exports = function getZerosCount(number, base) {
-    var divisor = 0, n = 2, arr = [], cur = base;
+//function getZerosCount(number, base) {
 
-    switch(base){
-        case 144: return 20652503;
-        case 108: return 5539053;
-        case 98: return 499929;
-        case 169: return 2250935;
-        case 192: return 3308046;
-        case 54: return 9687174;
-        case 196: return 13685;
-        case 250: return 14460180;
-        case 160: return 401792;
-        case 64: return 2293646;
-        case 16: return 16;
+    function findPrimeNumbers(base) {
+        var dividers = [];
+        for (var i = 2; i < base; i++) {
+            var prime = true;
+            for (var j = 2; j < Math.sqrt(i); j++) {
+                if (i % j == 0) {
+                    prime = false;
+                }
+            }
+            if (prime) {
+                dividers.push(i);
+            }
+        }
+        return dividers;
     }
 
-    while (cur != 1) {
-        cur % n != 0 ? n++ : cur /= n, arr.push(n);
+    function findPrimeDividers(base) {
+        var primeNumbers = findPrimeNumbers(base);
+        var primeDividers = {};
+        
+        for (var i = 0; i < primeNumbers.length; i++) {
+            while (base % primeNumbers[i] == 0) {
+                var primeDivider = base / primeNumbers[i];
+                base = primeDivider;
+                if (primeNumbers[i] in primeDividers) {
+                    primeDividers[primeNumbers[i]]++;
+                } else {
+                    primeDividers[primeNumbers[i]] = 1;
+                }
+            }
+        }
+        if(Object.keys(primeDividers).length == 0){
+            primeDividers[base] = 1;
+        }
+        return primeDividers;
     }
-    base == 49 || base == 147 ? divisor = 13 : divisor =  Math.max.apply(null, arr);
 
-    var temp = divisor, zeros = 0;
-    while (number > divisor) {
-        zeros += Math.floor(number / divisor);
-        divisor = divisor * temp;
+
+    
+
+    var dividers = findPrimeDividers(base);
+    var sums = JSON.parse(JSON.stringify(dividers));
+    var currNumber = number;
+
+    console.log(dividers)
+
+    for(var key in dividers){
+        var d = +key;
+        sums[key] = 0;
+        for(var i = 1; i <= Math.pow(key, dividers[key]); i++){
+            sums[key] += Math.floor(number / d);
+            d = d * +key;      
+        }
+       // sums[key] = Math.floor(sums[key] / dividers[key]);
+        number = currNumber;
+        
     }
+
+    var zeros = 9999999999999999999999999999;
+    for(var key in sums){
+        if(sums[key] < zeros) zeros = sums[key];
+    }
+
     return zeros;
+
+    console.log(sums)
+    console.log(zeros)
 }
+
